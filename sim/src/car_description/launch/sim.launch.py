@@ -2,8 +2,10 @@ import os
 import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
@@ -12,6 +14,11 @@ def generate_launch_description():
     robot_description = xacro.process_file(
         os.path.join(pkg, 'urdf', 'car.urdf.xacro')).toxml()
     world = os.path.join(pkg, 'worlds', 'track.sdf')
+    auto = LaunchConfiguration('auto')
+
+    auto_arg = DeclareLaunchArgument(
+        'auto', default_value='true',
+        description='Start lane following (true) or drive manually (false)')
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(
@@ -48,4 +55,18 @@ def generate_launch_description():
         executable='safety_node',
         parameters=[{'stop_distance': 0.3}])
 
-    return LaunchDescription([gazebo, robot_state_publisher, spawn, bridge, safety])
+    lane_detector = Node(
+        package='car_control',
+        executable='lane_detector',
+        condition=IfCondition(auto))
+
+    lane_controller = Node(
+        package='car_control',
+        executable='lane_controller',
+        parameters=[{'speed': 0.15, 'kp': 1.5, 'kd': 0.2}],
+        condition=IfCondition(auto))
+
+    return LaunchDescription([
+        auto_arg, gazebo, robot_state_publisher, spawn, bridge,
+        safety, lane_detector, lane_controller,
+    ])

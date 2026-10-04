@@ -22,9 +22,11 @@ setup(
             'pytest',
         ],
     },
-    entry_points={
+        entry_points={
         'console_scripts': [
-            'safety_node = car_control.safety_node:main'
+            'safety_node = car_control.safety_node:main',
+            'lane_detector = car_control.lane_detector:main',
+            'lane_controller = car_control.lane_controller:main',
         ],
     },
 )
