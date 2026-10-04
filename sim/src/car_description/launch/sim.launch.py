@@ -65,8 +65,14 @@ def generate_launch_description():
         executable='lane_controller',
         parameters=[{'speed': 0.15, 'kp': 1.5, 'kd': 0.2}],
         condition=IfCondition(auto))
+    
+    sign_detector = Node(
+        package='car_control',
+        executable='sign_detector',
+        parameters=[{'min_area': 1500}],
+        condition=IfCondition(auto))
 
     return LaunchDescription([
         auto_arg, gazebo, robot_state_publisher, spawn, bridge,
-        safety, lane_detector, lane_controller,
+        safety, lane_detector, lane_controller, sign_detector,
     ])

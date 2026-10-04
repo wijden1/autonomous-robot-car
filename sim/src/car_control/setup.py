@@ -27,6 +27,7 @@ setup(
             'safety_node = car_control.safety_node:main',
             'lane_detector = car_control.lane_detector:main',
             'lane_controller = car_control.lane_controller:main',
+            'sign_detector = car_control.sign_detector:main',
         ],
     },
 )

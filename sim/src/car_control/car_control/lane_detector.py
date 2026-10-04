@@ -64,7 +64,7 @@ class LaneDetector(Node):
         # Log the processing rate every 5 seconds
         self.frames += 1
         elapsed = time.monotonic() - self.t0
-        if elapsed > 5.0:
+        if elapsed > 30.0:
             self.get_logger().info(f'Processing {self.frames / elapsed:.1f} frames/s')
             self.frames = 0
             self.t0 = time.monotonic()

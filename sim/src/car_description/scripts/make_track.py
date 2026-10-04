@@ -1,4 +1,5 @@
-"""Generate an oval track world (worlds/track.sdf) with a yellow center line."""
+"""Generate an oval track world (worlds/track.sdf) with a yellow center line,
+white obstacles, and red (stop) and blue (slow) signs."""
 import math
 import os
 
@@ -35,7 +36,25 @@ def obstacle(name, x, y):
         </inertial>
         <collision name="c"><geometry><box><size>0.2 0.2 0.2</size></box></geometry></collision>
         <visual name="v"><geometry><box><size>0.2 0.2 0.2</size></box></geometry>
-          <material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material>
+          <material><ambient>0.9 0.9 0.9 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>"""
+
+
+def sign(name, x, y, rgb):
+    return f"""
+    <model name="{name}">
+      <static>true</static>
+      <pose>{x} {y} 0 0 0 0</pose>
+      <link name="link">
+        <visual name="post"><pose>0 0 0.025 0 0 0</pose>
+          <geometry><cylinder><radius>0.005</radius><length>0.05</length></cylinder></geometry>
+          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material>
+        </visual>
+        <visual name="board"><pose>0 0 0.10 0 0 0</pose>
+          <geometry><box><size>0.01 0.1 0.1</size></box></geometry>
+          <material><ambient>{rgb} 1</ambient><diffuse>{rgb} 1</diffuse></material>
         </visual>
       </link>
     </model>"""
@@ -80,8 +99,10 @@ world = f"""<?xml version="1.0"?>
 {line_visuals}
       </link>
     </model>
-{obstacle("obstacle_1", 0.5, -1.0)}
+{obstacle("obstacle_1", -1.0, 1.0)}
 {obstacle("obstacle_2", 1.0, 2.0)}
+{sign("stop_sign", 1.0, -1.25, "0.9 0.05 0.05")}
+{sign("slow_sign", 0.8, 1.25, "0.05 0.2 0.9")}
   </world>
 </sdf>
 """
