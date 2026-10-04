@@ -102,6 +102,87 @@
     <mu2>0.001</mu2>
   </gazebo>
 
+    <!-- ===== Sensors ===== -->
+
+  <!-- Front camera, tilted down to see the line on the floor -->
+  <link name="camera_link">
+    <visual>
+      <geometry><box size="0.015 0.03 0.015"/></geometry>
+      <material name="black"/>
+    </visual>
+    <xacro:box_inertia m="0.01" x="0.015" y="0.03" z="0.015"/>
+  </link>
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="0.1 0 0.05" rpy="0 0.35 0"/>
+  </joint>
+  <gazebo reference="camera_link">
+    <sensor name="camera" type="camera">
+      <always_on>true</always_on>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+      <topic>camera/image_raw</topic>
+      <gz_frame_id>camera_link</gz_frame_id>
+      <camera>
+        <horizontal_fov>1.2</horizontal_fov>
+        <image><width>320</width><height>240</height><format>R8G8B8</format></image>
+        <clip><near>0.02</near><far>20</far></clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- IMU in the middle of the car -->
+  <link name="imu_link">
+    <xacro:box_inertia m="0.01" x="0.01" y="0.01" z="0.01"/>
+  </link>
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+  <gazebo reference="imu_link">
+    <sensor name="imu" type="imu">
+      <always_on>true</always_on>
+      <update_rate>100</update_rate>
+      <topic>imu</topic>
+      <gz_frame_id>imu_link</gz_frame_id>
+    </sensor>
+  </gazebo>
+
+  <!-- Front distance sensor: 5 rays, 4 m range -->
+  <link name="range_link">
+    <visual>
+      <geometry><box size="0.01 0.03 0.01"/></geometry>
+      <material name="black"/>
+    </visual>
+    <xacro:box_inertia m="0.01" x="0.01" y="0.03" z="0.01"/>
+  </link>
+  <joint name="range_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="range_link"/>
+    <origin xyz="0.105 0 0"/>
+  </joint>
+  <gazebo reference="range_link">
+    <sensor name="front_range" type="gpu_lidar">
+      <always_on>true</always_on>
+      <update_rate>20</update_rate>
+      <visualize>true</visualize>
+      <topic>front_scan</topic>
+      <gz_frame_id>range_link</gz_frame_id>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>5</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.2</min_angle>
+            <max_angle>0.2</max_angle>
+          </horizontal>
+        </scan>
+        <range><min>0.05</min><max>4.0</max><resolution>0.01</resolution></range>
+      </lidar>
+    </sensor>
+  </gazebo>
   <!-- Gazebo plugins: drive control and joint states -->
   <gazebo>
     <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
