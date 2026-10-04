@@ -43,4 +43,9 @@ def generate_launch_description():
             '/front_scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
         ])
 
-    return LaunchDescription([gazebo, robot_state_publisher, spawn, bridge])
+    safety = Node(
+        package='car_control',
+        executable='safety_node',
+        parameters=[{'stop_distance': 0.3}])
+
+    return LaunchDescription([gazebo, robot_state_publisher, spawn, bridge, safety])

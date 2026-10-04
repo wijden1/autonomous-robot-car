@@ -80,7 +80,7 @@ world = f"""<?xml version="1.0"?>
 {line_visuals}
       </link>
     </model>
-{obstacle("obstacle_1", 0.0, 2.0)}
+{obstacle("obstacle_1", 0.5, -1.0)}
 {obstacle("obstacle_2", 1.0, 2.0)}
   </world>
 </sdf>

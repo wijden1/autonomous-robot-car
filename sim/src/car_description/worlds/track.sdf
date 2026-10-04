@@ -88,7 +88,7 @@
     </model>
 
     <model name="obstacle_1">
-      <pose>0.0 2.0 0.1 0 0 0</pose>
+      <pose>0.5 -1.0 0.1 0 0 0</pose>
       <link name="link">
         <inertial><mass>1.0</mass>
           <inertia><ixx>0.007</ixx><iyy>0.007</iyy><izz>0.007</izz></inertia>
