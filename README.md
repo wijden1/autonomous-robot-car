@@ -77,7 +77,7 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r cmd_vel:=cmd_
 - [x] Robot model and Gazebo simulation
 - [x] Camera, IMU and distance sensor
 - [x] Lane following, sign detection, state machine, safety layer
-- [ ] Motor-control firmware in C with FreeRTOS against a DC motor model
+- [x] Motor-control firmware in C with FreeRTOS against a DC motor model ([firmware/](firmware/))
 - [ ] CAN bus communication between firmware and simulation (software-in-the-loop)
 - [ ] Live telemetry with MQTT, InfluxDB and Grafana in Docker
 - [ ] Unit tests and CI with GitHub Actions
