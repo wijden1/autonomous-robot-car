@@ -20,11 +20,11 @@ set(FREERTOS_PORT GCC_POSIX CACHE STRING "" FORCE)
 set(FREERTOS_HEAP 4 CACHE STRING "" FORCE)
 FetchContent_MakeAvailable(freertos_kernel)
 
-add_executable(motor_firmware src/main.c src/hal_sim.c)
+add_executable(motor_firmware src/main.c src/hal_sim.c src/hal_can_socketcan.c)
 target_link_libraries(motor_firmware PRIVATE control freertos_kernel freertos_config pthread)
 
 # Hardware-independent control code (no FreeRTOS -> easy to unit-test)
-add_library(control STATIC src/pid.c src/motor_model.c)
+add_library(control STATIC src/pid.c src/motor_model.c src/can_protocol.c)
 target_include_directories(control PUBLIC include)
 target_link_libraries(control PUBLIC m)
 
@@ -37,3 +37,7 @@ add_test(NAME motor_model_tests COMMAND test_motor_model)
 add_executable(test_pid tests/test_pid.c)
 target_link_libraries(test_pid PRIVATE control)
 add_test(NAME pid_tests COMMAND test_pid)
+
+add_executable(test_can_protocol tests/test_can_protocol.c)
+target_link_libraries(test_can_protocol PRIVATE control)
+add_test(NAME can_protocol_tests COMMAND test_can_protocol)
