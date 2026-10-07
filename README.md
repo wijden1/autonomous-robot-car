@@ -1,8 +1,11 @@
 # Autonomous Robot Car
+
 [![CI](https://github.com/wijden1/autonomous-robot-car/actions/workflows/ci.yml/badge.svg)](https://github.com/wijden1/autonomous-robot-car/actions/workflows/ci.yml)
+
 A self-driving robot car built with **ROS 2 Jazzy**, **Gazebo Harmonic** and **OpenCV**. The car follows a lane using its camera, reacts to stop and slow signs with a state machine, and stops automatically in front of obstacles through a dedicated safety layer.
 
 ▶️ **[Watch the demo video](https://youtu.be/lhqgWsQx_aQ)**
+
 ▶️ **[CAN bus + fault test video](https://youtu.be/jLw73U_2GGI)**
 
 ![Demo](docs/images/demo.png)
