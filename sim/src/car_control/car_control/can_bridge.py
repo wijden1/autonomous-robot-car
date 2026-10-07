@@ -65,6 +65,9 @@ class CanBridge(Node):
     def send_command(self):
         left, right = wheel_rpms_from_twist(self.target.linear.x, self.target.angular.z,
                                             self.track, self.radius, self.gear)
+        if not self.ok:
+            left = right = 0.0   # fault: stop ALL motors, not only the car in Gazebo
+        
         clamp = lambda x: int(max(-5000, min(5000, round(x))))
         data = self.cmd_msg.encode({'SetpointLeft': clamp(left), 'SetpointRight': clamp(right),
                                     'AliveCounter': self.counter})
