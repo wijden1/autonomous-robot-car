@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  firmware:
+    name: Firmware build and unit tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure (downloads FreeRTOS)
+        run: cmake -S firmware -B firmware/build
+
+      - name: Build
+        run: cmake --build firmware/build -j
+
+      - name: Unit tests (PID, motor model, CAN protocol)
+        run: ctest --test-dir firmware/build --output-on-failure
+
+      - name: Run the 7 s test scenario
+        working-directory: firmware/build
+        run: timeout 20 ./motor_firmware
+
+  can-and-python:
+    name: DBC check and Python syntax
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install CAN tools
+        run: pip install cantools python-can
+
+      - name: DBC file loads and encodes the expected bytes
+        run: python can/can_test.py
+
+      - name: Python files compile
+        run: python -m py_compile sim/src/car_control/car_control/*.py sim/src/car_description/scripts/*.py

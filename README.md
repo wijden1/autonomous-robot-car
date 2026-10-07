@@ -1,5 +1,5 @@
 # Autonomous Robot Car
-
+[![CI](https://github.com/wijden1/autonomous-robot-car/actions/workflows/ci.yml/badge.svg)](https://github.com/wijden1/autonomous-robot-car/actions/workflows/ci.yml)
 A self-driving robot car built with **ROS 2 Jazzy**, **Gazebo Harmonic** and **OpenCV**. The car follows a lane using its camera, reacts to stop and slow signs with a state machine, and stops automatically in front of obstacles through a dedicated safety layer.
 
 ▶️ **[Watch the demo video](https://youtu.be/lhqgWsQx_aQ)**
@@ -34,6 +34,35 @@ flowchart LR
 | `sign_detector` | Detects stop and slow signs |
 | `lane_controller` | PD steering and the DRIVE / SLOW / STOP state machine |
 | `safety_node` | Blocks forward driving near obstacles or when sensor data is missing |
+
+## CAN bus software-in-the-loop (SIL)
+
+With `use_can:=true`, the wheels are no longer driven directly by ROS 2. Every command goes over a CAN bus (Linux SocketCAN, `vcan0`) to two motor ECUs running the [FreeRTOS firmware](firmware/), and the car in Gazebo moves with the speed the motors **really** reach.
+
+```mermaid
+flowchart LR
+    SN[safety_node] -- /cmd_vel_safe --> CB[can_bridge]
+    CB -- "WHEEL_CMD 0x100" --> L[Motor ECU left<br/>FreeRTOS]
+    CB -- "WHEEL_CMD 0x100" --> R[Motor ECU right<br/>FreeRTOS]
+    L -- "MOTOR_STATUS 0x201" --> CB
+    R -- "MOTOR_STATUS 0x202" --> CB
+    CB -- /cmd_vel --> CAR[Car in Gazebo]
+```
+
+| ID | Message | Rate | Content |
+|---|---|---|---|
+| `0x100` | WHEEL_CMD | 20 Hz | Setpoint left/right [rpm], alive counter |
+| `0x201` / `0x202` | MOTOR_STATUS | 50 Hz | Measured speed [rpm], voltage [V], state, alive counter |
+
+- Messages defined in a DBC file ([can/robot_car.dbc](can/robot_car.dbc)), shared by the C firmware and the Python bridge
+- Differential-drive kinematics and gear ratio in the bridge
+- Fail-safe on both sides: ECU watchdog after 500 ms without commands, alive-counter check against frozen senders, and the car stops when an ECU stops reporting
+
+```bash
+scripts/setup_vcan.sh
+ros2 launch car_description sim.launch.py use_can:=true
+candump vcan0 | python3 -m cantools decode can/robot_car.dbc   # watch the bus
+```
 
 ## Tech stack
 
@@ -78,7 +107,7 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r cmd_vel:=cmd_
 - [x] Camera, IMU and distance sensor
 - [x] Lane following, sign detection, state machine, safety layer
 - [x] Motor-control firmware in C with FreeRTOS against a DC motor model ([firmware/](firmware/))
-- [ ] CAN bus communication between firmware and simulation (software-in-the-loop)
+- [x] CAN bus communication between firmware and simulation (software-in-the-loop)
 - [ ] Live telemetry with MQTT, InfluxDB and Grafana in Docker
 - [ ] Unit tests and CI with GitHub Actions
 
