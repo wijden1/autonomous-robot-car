@@ -28,6 +28,7 @@ setup(
             'lane_detector = car_control.lane_detector:main',
             'lane_controller = car_control.lane_controller:main',
             'sign_detector = car_control.sign_detector:main',
+            'can_bridge = car_control.can_bridge:main',
         ],
     },
 )
