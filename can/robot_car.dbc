@@ -1,0 +1,33 @@
+VERSION ""
+
+NS_ :
+
+BS_:
+
+BU_: ROS_BRIDGE MOTOR_LEFT MOTOR_RIGHT
+
+BO_ 256 WHEEL_CMD: 5 ROS_BRIDGE
+ SG_ SetpointLeft : 0|16@1- (1,0) [-5000|5000] "rpm" MOTOR_LEFT
+ SG_ SetpointRight : 16|16@1- (1,0) [-5000|5000] "rpm" MOTOR_RIGHT
+ SG_ AliveCounter : 32|8@1+ (1,0) [0|255] "" MOTOR_LEFT,MOTOR_RIGHT
+
+BO_ 513 MOTOR_STATUS_LEFT: 6 MOTOR_LEFT
+ SG_ SpeedRpm : 0|16@1- (1,0) [-5000|5000] "rpm" ROS_BRIDGE
+ SG_ Voltage : 16|16@1- (0.01,0) [-12|12] "V" ROS_BRIDGE
+ SG_ State : 32|8@1+ (1,0) [0|1] "" ROS_BRIDGE
+ SG_ AliveCounter : 40|8@1+ (1,0) [0|255] "" ROS_BRIDGE
+
+BO_ 514 MOTOR_STATUS_RIGHT: 6 MOTOR_RIGHT
+ SG_ SpeedRpm : 0|16@1- (1,0) [-5000|5000] "rpm" ROS_BRIDGE
+ SG_ Voltage : 16|16@1- (0.01,0) [-12|12] "V" ROS_BRIDGE
+ SG_ State : 32|8@1+ (1,0) [0|1] "" ROS_BRIDGE
+ SG_ AliveCounter : 40|8@1+ (1,0) [0|255] "" ROS_BRIDGE
+
+CM_ BO_ 256 "Wheel speed setpoints from ROS 2, sent every 50 ms (heartbeat)";
+CM_ BO_ 513 "Measured speed and state of the left motor ECU, sent every 20 ms";
+CM_ BO_ 514 "Measured speed and state of the right motor ECU, sent every 20 ms";
+CM_ SG_ 513 State "0 = OK, 1 = WATCHDOG (no command, motor off)";
+CM_ SG_ 514 State "0 = OK, 1 = WATCHDOG (no command, motor off)";
+
+VAL_ 513 State 0 "OK" 1 "WATCHDOG" ;
+VAL_ 514 State 0 "OK" 1 "WATCHDOG" ;
