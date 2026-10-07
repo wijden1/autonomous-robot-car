@@ -20,8 +20,8 @@ set(FREERTOS_PORT GCC_POSIX CACHE STRING "" FORCE)
 set(FREERTOS_HEAP 4 CACHE STRING "" FORCE)
 FetchContent_MakeAvailable(freertos_kernel)
 
-add_executable(motor_firmware src/main.c)
-target_link_libraries(motor_firmware PRIVATE freertos_kernel freertos_config pthread)
+add_executable(motor_firmware src/main.c src/hal_sim.c)
+target_link_libraries(motor_firmware PRIVATE control freertos_kernel freertos_config pthread)
 
 # Hardware-independent control code (no FreeRTOS -> easy to unit-test)
 add_library(control STATIC src/pid.c src/motor_model.c)
