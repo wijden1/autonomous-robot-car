@@ -22,3 +22,14 @@ FetchContent_MakeAvailable(freertos_kernel)
 
 add_executable(motor_firmware src/main.c)
 target_link_libraries(motor_firmware PRIVATE freertos_kernel freertos_config pthread)
+
+# Hardware-independent control code (no FreeRTOS -> easy to unit-test)
+add_library(control STATIC src/motor_model.c)
+target_include_directories(control PUBLIC include)
+target_link_libraries(control PUBLIC m)
+
+# Unit tests:  ctest --test-dir build --output-on-failure
+enable_testing()
+add_executable(test_motor_model tests/test_motor_model.c)
+target_link_libraries(test_motor_model PRIVATE control)
+add_test(NAME motor_model_tests COMMAND test_motor_model)
