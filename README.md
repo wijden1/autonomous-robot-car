@@ -68,6 +68,23 @@ ros2 launch car_description sim.launch.py use_can:=true
 candump vcan0 | python3 -m cantools decode can/robot_car.dbc   # watch the bus
 ```
 
+## Testing
+
+Four levels of automated tests, from fast and isolated to the full system:
+
+| Level | What is tested | Tool | Runs in CI |
+|---|---|---|---|
+| Firmware unit tests | PID with anti-windup, DC motor model, CAN packing (must match the DBC) | CTest | ✅ |
+| Python unit tests | Safety rules, PD lane steering, sign state machine (23 tests) | pytest | ✅ |
+| ROS 2 integration test | Real `safety_node` process: clear path, obstacle, silent sensor, clean shutdown | launch_testing | ✅ (ROS 2 container) |
+| Simulation scenario test | Full autonomous lap in Gazebo: stops at the stop sign, slows down, stops before the obstacle | launch_testing + Gazebo | local (needs GPU rendering) |
+
+```bash
+python3 -m pytest sim/src/car_control/test/test_safety_logic.py sim/src/car_control/test/test_lane_logic.py
+launch_test sim/src/car_control/test/test_safety_node_integration.py
+launch_test sim/src/car_control/test/test_scenario_lap.py
+```
+
 ## Tech stack
 
 ROS 2 Jazzy · Gazebo Harmonic · Python · OpenCV · NumPy · URDF/xacro · ros_gz_bridge · Ubuntu 24.04 (WSL2)
