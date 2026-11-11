@@ -49,3 +49,26 @@ jobs:
         run: |
           pip install pytest
           python -m pytest -v test/test_safety_logic.py test/test_lane_logic.py
+
+  ros-integration:
+    name: ROS 2 integration test (launch_testing)
+    runs-on: ubuntu-24.04
+    container: ros:jazzy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install launch_testing
+        run: apt-get update && apt-get install -y ros-jazzy-launch-testing-ros
+
+      - name: Build car_control
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          cd sim && colcon build --packages-select car_control
+
+      - name: Run safety_node integration test
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source sim/install/setup.bash
+          launch_test sim/src/car_control/test/test_safety_node_integration.py
