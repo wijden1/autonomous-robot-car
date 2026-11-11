@@ -43,3 +43,9 @@ jobs:
 
       - name: Python files compile
         run: python -m py_compile sim/src/car_control/car_control/*.py sim/src/car_description/scripts/*.py
+
+      - name: Unit tests of the driving logic (pytest)
+        working-directory: sim/src/car_control
+        run: |
+          pip install pytest
+          python -m pytest -v test/test_safety_logic.py test/test_lane_logic.py
