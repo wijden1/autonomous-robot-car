@@ -72,3 +72,7 @@ sim/build/
 sim/install/
 sim/log/
 firmware/build/
+
+# Python cache
+__pycache__/
+*.pyc
